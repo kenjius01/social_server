@@ -34,14 +34,15 @@ type Follower struct {
 
 func CreateResponseUser(userModel models.User) User {
 	return User{ID: userModel.ID,
-		Username:    userModel.Username,
-		FirstName:   userModel.FirstName,
-		LastName:    userModel.LastName,
-		Avatar:      userModel.Avatar,
-		CoverImage:  userModel.CoverImage,
-		Description: userModel.Description,
-		Address:     userModel.Address,
-		WorkAt:      userModel.WorkAt, Relationship: userModel.Relationship}
+		Username:     userModel.Username,
+		FirstName:    userModel.FirstName,
+		LastName:     userModel.LastName,
+		Avatar:       userModel.Avatar,
+		CoverImage:   userModel.CoverImage,
+		Description:  userModel.Description,
+		Address:      userModel.Address,
+		WorkAt:       userModel.WorkAt,
+		Relationship: userModel.Relationship}
 }
 
 func CreateResponseFollowUser(followUser models.Follower, user User, follower User) Follower {
@@ -104,6 +105,7 @@ func UpdateUser(c *fiber.Ctx) error {
 		})
 	}
 	type UpdateUser struct {
+		ID           int    `json:"id"`
 		FirstName    string `json:"firstName"`
 		LastName     string `json:"lastName"`
 		Avatar       string `json:"avatar"`
@@ -118,6 +120,7 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 	database.DB.Model(&user).Updates(models.User{
+		ID:           updateData.ID,
 		FirstName:    updateData.FirstName,
 		LastName:     updateData.LastName,
 		Avatar:       updateData.Avatar,
@@ -261,14 +264,8 @@ func GetAllFollowers(c *fiber.Ctx) error {
 }
 
 func GetAllFollwing(c *fiber.Ctx) error {
-	type ListFollower struct {
-		Id        string `json:"id"`
-		Username  string `json:"username"`
-		FirstName string `json:"firstName"`
-		LastName  string `json:"lastName"`
-		Avatar    string `json:"avatar"`
-	}
-	result := []ListFollower{}
+
+	result := []int{}
 	id, err := c.ParamsInt("id")
 	user := models.User{}
 	if err != nil {
@@ -277,7 +274,7 @@ func GetAllFollwing(c *fiber.Ctx) error {
 	if err := findUser(id, &user); err != nil {
 		return c.Status(404).JSON(err.Error())
 	}
-	database.DB.Model(&models.User{}).Select("users.id, users.username,users.first_name,users.last_name,users.avatar").Joins("left join followers on users.id = followers.user_id").Where("	user_id = ?", id).Scan(&result)
+	database.DB.Model(&models.Follower{}).Select("follower_id").Find(&result, "user_id = ?", id)
 	return c.Status(200).JSON(result)
 
 }

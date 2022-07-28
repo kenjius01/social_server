@@ -28,7 +28,7 @@ func Setup(app *fiber.App) {
 
 	//Post enpoint
 	post := app.Group("/post")
-	post.Post("/", middlewares.VerifyUserPost, controllers.CreatePost)
+	post.Post("/", controllers.CreatePost)
 	post.Get("/", controllers.GetAllPost)
 	post.Get("/:id", controllers.GetPost)
 	post.Put("/:id", middlewares.VerifyUserPost, controllers.UpdatePost)

@@ -156,7 +156,7 @@ func GetPostTimeLine(c *fiber.Ctx) error {
 	posts := []models.Post{}
 	if err := database.DB.Raw("? UNION ?",
 		database.DB.Model(&models.Post{}).Joins("inner join followers f on f.user_id = posts.user_id AND f.follower_id = ?", id),
-		database.DB.Model(&models.Post{}).Where("user_id = ?", id),
+		database.DB.Model(&models.Post{}).Order("updated_at desc").Where("user_id = ?", id),
 	).Scan(&posts).Error; err != nil {
 		return c.Status(400).JSON(err.Error())
 	}

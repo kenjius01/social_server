@@ -31,7 +31,7 @@ func Register(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	return c.Status(200).JSON(user)
+	return c.Status(200).JSON(CreateResponseUser(user))
 }
 
 func Login(c *fiber.Ctx) error {
@@ -75,10 +75,10 @@ func Login(c *fiber.Ctx) error {
 		Name:     "jwt",
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 99999),
-		HTTPOnly: true,
+		HTTPOnly: false,
 	}
 	c.Cookie(&cookie)
-	return c.JSON(user)
+	return c.JSON(CreateResponseUser(user))
 
 }
 
